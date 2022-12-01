@@ -26,5 +26,9 @@ namespace ShoppingCart.Models
 		public Category Category { get; set; }
 
 		public string Image { get; set; }
+
+		[NotMapped]
+		[FileExtensions]
+		public IFormFile ImageUpload { get; set; }
 	}
 }
