@@ -23,7 +23,8 @@ namespace ShoppingCart.Models
 
 		public Guid CategoryId { get; set; }
 
-		public Category Category { get; set; }
+        [Required, Range(1, int.MaxValue, ErrorMessage = "You must choose a category")]
+        public Category Category { get; set; }
 
 		public string Image { get; set; }
 
