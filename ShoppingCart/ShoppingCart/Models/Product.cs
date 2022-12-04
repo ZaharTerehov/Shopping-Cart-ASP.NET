@@ -26,7 +26,7 @@ namespace ShoppingCart.Models
         [Required, Range(1, int.MaxValue, ErrorMessage = "You must choose a category")]
         public Category Category { get; set; }
 
-		public string Image { get; set; }
+		public string Image { get; set; } = "noimage.png";
 
 		[NotMapped]
 		[FileExtensions]

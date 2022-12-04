@@ -86,5 +86,57 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
             return View(product);
         }
+
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            Product product = await _context.Products.FindAsync(id);
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+
+            return View(product);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, Product product)
+        {
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+
+            if (ModelState.IsValid)
+            {
+                product.Slug = product.Name.ToLower().Replace("", "-");
+
+                var slug = await _context.Products.FirstOrDefaultAsync(p => p.Slug == product.Slug);
+
+                if (slug != null)
+                {
+                    ModelState.AddModelError("", "The product already exist");
+
+                    return View(product);
+                }
+
+
+                if (product.ImageUpload != null)
+                {
+                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                    string imageName = Guid.NewGuid().ToString() + "_" + product.ImageUpload.FileName;
+
+                    string filePath = Path.Combine(uploadsDir, imageName);
+
+                    FileStream fileStream = new FileStream(filePath, FileMode.Create);
+                    await product.ImageUpload.CopyToAsync(fileStream);
+
+                    fileStream.Close();
+
+                    product.Image = imageName;
+                }
+
+                _context.Update(product);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "The product has been edited!";
+            }
+
+            return View(product);
+        }
     }
 }
